@@ -15,10 +15,12 @@ async def on_ready():
     print('Bot is ready.')
 
 @bot.command()
-async def ageleaderboard(ctx, amount = 1):
+async def ageleaderboard(ctx, amount = 3):
+    
     guild = bot.get_guild(ctx.guild.id)
     server_total = guild.member_count
-    if amount > server_total:
+
+    if int(amount) > server_total:
         await ctx.send(f"Input amount less than {guild.member_count}")
         return
     if server_total == 2:
@@ -36,7 +38,7 @@ async def ageleaderboard(ctx, amount = 1):
     for i in range(amount):
         username = bot.get_user(leaderboard[i][0]).name
         joindate = bot.get_user(leaderboard[i][0]).created_at.strftime("%d/%m/%Y")
-        temp = temp + ((f"\n{i+1}. {username} {joindate}"))
+        temp = temp + ((f"\n{i+1}. **{username}** *{joindate}*"))
         if ((i+1) % 10 == 0):
             messagelist.append(temp)
             temp = ''
@@ -47,10 +49,11 @@ async def ageleaderboard(ctx, amount = 1):
     embeds = []
 
     for i in range(len(messagelist)):
-        embeds.append(discord.Embed(title="Leaderboard", description=messagelist[i]))
+        embeds.append(discord.Embed(title="Leaderboard", description=messagelist[i], color=discord.Color.dark_red()))
 
-    PreviousButton = discord.ui.Button(label="<", style=discord.ButtonStyle.grey)
-    NextButton = discord.ui.Button(label=">", style=discord.ButtonStyle.grey)
+    PreviousButton = discord.ui.Button(label="<", style=discord.ButtonStyle.red)
+    NextButton = discord.ui.Button(label=">", style=discord.ButtonStyle.red)
+    PageCounterStyle = discord.ButtonStyle.red
     InitialPage = 0 
     timeout = 60 
 
@@ -58,6 +61,11 @@ async def ageleaderboard(ctx, amount = 1):
         PreviousButton=PreviousButton,
         NextButton=NextButton,
         InitialPage=InitialPage,
+        PageCounterStyle = PageCounterStyle,
         timeout=timeout).start(ctx, pages=embeds)
+
+@bot.command()
+async def av(ctx, user: discord.Member):
+    await ctx.send(user.avatar)
 
 bot.run(os.getenv('APIKEY'))
